@@ -7,19 +7,14 @@ import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-
-
-import common.Generic;
-
 import org.junit.Assert;
 
 public class ProductsPage{
-	WebDriver driver;
-	WebDriverWait wait;
+	WebDriver driver;					// Instantiating WebDriver
+	WebDriverWait wait;					// Instantiating WebDriver Wait
 
 	
-	
-	@FindBy(xpath="//*[@class='a-dropdown-prompt']")
+	@FindBy(xpath="//*[@class='a-dropdown-prompt']")			// Page Object Factory is implemented using @FindBy annotation to store locator values
 	WebElement sortButton;
 	
 	@FindBy(xpath="//a[text()='Price: High to Low']")
@@ -44,19 +39,22 @@ public class ProductsPage{
 	}
 	
 	public void sort_High_to_low() {
-		wait.until(ExpectedConditions.visibilityOf(sortButton));
-		sortButton.click();
-		wait.until(ExpectedConditions.visibilityOf(sortDesc));
-		sortDesc.click();
-		
-		
+		wait.until(ExpectedConditions.visibilityOf(sortButton));				
+		sortButton.click();														// Sorting button is clicked	
+		wait.until(ExpectedConditions.visibilityOf(sortDesc));				
+		sortDesc.click();														// Sorting from High to Low price is selected
 	}
 	
-	public void verify_sorted_product() {
+	public String verify_sorted_product() {
 		wait.until(ExpectedConditions.visibilityOf(sortButton));
-		String Actual_text=sortButton.getText();
-		System.out.println(Actual_text);
-		Assert.assertEquals("Price: High to Low", Actual_text);
+		String Actual_text=sortButton.getText();								
+		try{
+			Assert.assertEquals("Price: High to Low", Actual_text);					// Assertion is used to verify that right sorting element is clicked
+			return "pass";
+		}
+		catch (AssertionError e) {
+			return e.toString();
+		}
 		
 	}
 	
@@ -68,14 +66,13 @@ public class ProductsPage{
 	
 	public String validate_sorted_product(String string) {
 		wait.until(ExpectedConditions.visibilityOf(productTitle));
-		String Expected_Title=string;
-		String Actual_Title = productTitle.getText();
-		System.out.println(Actual_Title);
+		String Expected_Title=string;										// Expected product text is fetched as a parameter
+		String Actual_Title = productTitle.getText();						// Actual product text is fetched
+		
 		try {
-			Assert.assertEquals(Expected_Title, Actual_Title.contains(Expected_Title));
+			Assert.assertEquals(Expected_Title, Actual_Title.contains(Expected_Title));		// Assertion is used to verify that 2nd product is Nikon D3X 
 			return "Pass";
-		}catch (AssertionError a) {
-			System.out.println(a.toString());
+		}catch (AssertionError a) {													// On failure Assertion error is raised
 			return "Expected :"+Expected_Title+" ,But got :"+Actual_Title;	
 		}
 	}

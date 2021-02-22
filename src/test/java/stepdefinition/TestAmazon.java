@@ -16,8 +16,6 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import com.relevantcodes.extentreports.ExtentReports;
 import com.relevantcodes.extentreports.ExtentTest;
 import com.relevantcodes.extentreports.LogStatus;
-
-import common.Generic;
 import io.cucumber.java.After;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -27,37 +25,37 @@ import pageObject.ProductsPage;
 
 public class TestAmazon {
 
-	WebDriver driver;
-	Generic generic;
-	HomePage home;
+	WebDriver driver;			// Instantiating WebDriver
+	HomePage home;				
 	ProductsPage product;
 	public static ExtentReports reports;
 	public static ExtentTest test;
+	public String status="";
 	
-	public WebDriver getdriver() {
+	public WebDriver getdriver() {		// Constructor returns webdriver to re use same webdriver in other pages in PageObject package
 		return driver;
 	}
 	
-	@Given("Navigate to {string} application")
+	@Given("Navigate to {string} application")		// Setup
 	public void navigate_to_application(String string) {
-		System.setProperty("webdriver.chrome.driver", "driver\\chromedriver.exe");
-	    driver=new ChromeDriver();
-	    driver.get("https://"+string);
-	    driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-	    driver.manage().window().maximize();
-	    reports=new ExtentReports(System.getProperty("user.dir")+"\\Report\\Extenreport.html");
+		System.setProperty("webdriver.chrome.driver", "driver\\chromedriver.exe");		// Chrome driver executable
+	    driver=new ChromeDriver();														// object creation for chrome driver
+	    driver.get("https://"+string);													// To navigate to url
+	    driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);				// Implicit wait time for 10 seconds to allow url to load
+	    driver.manage().window().maximize();											// To Maximize the browser
+	    reports=new ExtentReports(System.getProperty("user.dir")+"\\Report\\Extenreport.html");  // Directory for creating report
 	}
 	
-	@When("As a Guest user search for Nikon Products")
+	@When("As a Guest user search for Nikon Products")			// Annotations with feature file step
 	public void as_a_guest_user_search_for_nikon_products() throws IOException {
-	   home=new HomePage(driver);
-	   test=reports.startTest("Home");
+	   home=new HomePage(driver);								// Object for HomePage is created by passing webdriver
+	   test=reports.startTest("Home");							// Toggles the start of report and add logs 				
 	   try{
-		   home.search_product("Nikon");
-		   test.log(LogStatus.PASS, "User able to search for a product");
+		   home.search_product("Nikon");						// method is called with the object created
+		   test.log(LogStatus.PASS, "User able to search for a product");	// On success logs are appended with message in to report
 		}catch(Exception e) {
-			test.log(LogStatus.FAIL, e);
-			String screenshotpath=getScreenshot(driver,new Exception().getStackTrace()[0].getMethodName());
+			test.log(LogStatus.FAIL, e);									// On failure logs are appended along with screenshot in report.
+			String screenshotpath=getScreenshot(driver,new Exception().getStackTrace()[0].getMethodName());		// screenshot path
 			test.log(LogStatus.FAIL, test.addScreenCapture(screenshotpath));
 		}
 	}
@@ -65,7 +63,7 @@ public class TestAmazon {
 	@When("Sort from High to Low price")
 	public void sort_from_high_to_low_price() throws IOException {
 	    // Write code here that turns the phrase above into concrete actions
-		product=new ProductsPage(driver);
+		product=new ProductsPage(driver);			// Object for product page
 		test=reports.startTest("Product sorting");
 		try {
 		product.sort_High_to_low();
@@ -82,23 +80,29 @@ public class TestAmazon {
 	public void results_are_sorted() throws IOException {
 	    // Write code here that turns the phrase above into concrete actions
 		product=new ProductsPage(driver);
-		test=reports.startTest("Product Sorting");
+		test=reports.startTest("Verfifying Sorting");
+		status="";
 		try{
-			product.verify_sorted_product();
-			test.log(LogStatus.PASS, "Sorting was successfull");
+			status=product.verify_sorted_product();
+			if(status.equalsIgnoreCase("pass")) {
+				test.log(LogStatus.PASS, "Sorting was successfull");
+			}
+			else {
+				test.log(LogStatus.FAIL, status);
+				String screenshotpath=getScreenshot(driver,new Exception().getStackTrace()[0].getMethodName());
+				test.log(LogStatus.FAIL, test.addScreenCapture(screenshotpath));
+			}
 		}catch(Exception e) {
 			test.log(LogStatus.FAIL, e);
-			String screenshotpath=getScreenshot(driver,new Exception().getStackTrace()[0].getMethodName());
-			test.log(LogStatus.FAIL, test.addScreenCapture(screenshotpath));
+			
 		}
 	    
 	}
 
 	@Then("Select second product from the result")
 	public void select_second_product_from_the_result() throws IOException {
-	    // Write code here that turns the phrase above into concrete actions
 		product=new ProductsPage(driver);
-		test=reports.startTest("Product Sorting");
+		test=reports.startTest("Selecting Product");
 		try {
 		product.select_sorted_product();
 		test.log(LogStatus.PASS, "User selected a second product after sorting");
@@ -111,13 +115,13 @@ public class TestAmazon {
 
 	@Then("Verify Product should be titled as {string}")
 	public String verify_product_should_be_titled_as(String string) {
-		String status="";
+		status="";
 		product=new ProductsPage(driver);
-		test=reports.startTest("Product Sorting");
+		test=reports.startTest("Verification of Product Details");
 		try {
-			status=product.validate_sorted_product(string);
+			status=product.validate_sorted_product(string);			// storing the result of method executed
 			System.out.println("In try");
-			if(status.equalsIgnoreCase("pass")) {
+			if(status.equalsIgnoreCase("pass")) {					// Validates Assertion result
 				test.log(LogStatus.PASS, "Product details displayed was as expected");
 			}
 			else {
@@ -135,10 +139,14 @@ public class TestAmazon {
 		}
 	@After
 	public void tearDown() {
-	    reports.flush();
-	    driver.quit();
+	    reports.flush();		// Ends the report
+	    driver.quit();			// close the chromedriver
 	}
 	
+	
+	
+		/*	Method to capture screenshot and appends current timestamp with screenshot name passed as parameter 
+		 	and stores in .png format in FailureScreesnhot directory */
 	public static String getScreenshot(WebDriver driver, String screenshotName) throws IOException {
 		String dateName=new SimpleDateFormat("yyyymmddhhmm").format(new Date());
 		TakesScreenshot ts=(TakesScreenshot)driver;
