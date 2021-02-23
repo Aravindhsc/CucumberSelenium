@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.AfterClass;
+import org.junit.Assert;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
@@ -57,6 +57,7 @@ public class TestAmazon {
 			test.log(LogStatus.FAIL, e);									// On failure logs are appended along with screenshot in report.
 			String screenshotpath=getScreenshot(driver,new Exception().getStackTrace()[0].getMethodName());		// screenshot path
 			test.log(LogStatus.FAIL, test.addScreenCapture(screenshotpath));
+			Assert.fail("Please check the report for more details on error");
 		}
 	}
 
@@ -72,6 +73,7 @@ public class TestAmazon {
 			test.log(LogStatus.FAIL, e);
 			String screenshotpath=getScreenshot(driver,new Exception().getStackTrace()[0].getMethodName());
 			test.log(LogStatus.FAIL, test.addScreenCapture(screenshotpath));
+			Assert.fail("Please check the report for more details on error");
 		}
 	    
 	}
@@ -94,7 +96,7 @@ public class TestAmazon {
 			}
 		}catch(Exception e) {
 			test.log(LogStatus.FAIL, e);
-			
+			Assert.fail("Please check the report for more details on error");
 		}
 	    
 	}
@@ -110,6 +112,7 @@ public class TestAmazon {
 			test.log(LogStatus.FAIL, e);
 			String screenshotpath=getScreenshot(driver,new Exception().getStackTrace()[0].getMethodName());
 			test.log(LogStatus.FAIL, test.addScreenCapture(screenshotpath));
+			Assert.fail("Please check the report for more details on error");
 		}
 	}
 
@@ -128,6 +131,7 @@ public class TestAmazon {
 				test.log(LogStatus.FAIL, status);
 				String screenshotpath=getScreenshot(driver,new Exception().getStackTrace()[0].getMethodName());
 				test.log(LogStatus.FAIL, test.addScreenCapture(screenshotpath));
+				Assert.fail("Please check the report for more details on error");
 			}
 			return status;
 		}catch(Exception e) {
